@@ -1,8 +1,10 @@
 import json
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel,Field
 
+from app.extract import ExtractionError, extract_job
+from app.schemas import ExtractRequest
 
 
 from app import llm
@@ -38,3 +40,10 @@ async def ask_stream(req: AskRequest):
               yield f"data: {json.dumps(event)}\n\n"
 
     return StreamingResponse(event_stream(),media_type="text/event-stream")
+
+@app.post("/extract")
+async def extract(req: ExtractRequest):
+    try:
+        return await extract_job(req.text)
+    except ExtractionError as error:
+        raise HTTPException(status_code=502, detail=str(error))
