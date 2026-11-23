@@ -6,6 +6,10 @@ from pydantic import BaseModel,Field
 from app.extract import ExtractionError, extract_job
 from app.schemas import ExtractRequest
 
+from app.ingest import ingest_document
+from app.rag import answer_question
+from app.schemas import DocumentRequest, ExtractRequest, QuestionRequest
+
 
 from app import llm
 
@@ -47,3 +51,13 @@ async def extract(req: ExtractRequest):
         return await extract_job(req.text)
     except ExtractionError as error:
         raise HTTPException(status_code=502, detail=str(error))
+
+
+@app.post("/documents")
+async def add_document(req: DocumentRequest):
+    return await ingest_document(req.title, req.text, req.source)
+
+
+@app.post("/rag/ask")
+async def rag_ask(req: QuestionRequest):
+    return await answer_question(req.question)

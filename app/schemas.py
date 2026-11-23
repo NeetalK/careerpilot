@@ -18,3 +18,13 @@ class JobPost(BaseModel):
 
 class ExtractRequest(BaseModel):
     text: str = Field(min_length=20, max_length=20000)
+
+
+class DocumentRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=200)
+    text: str = Field(min_length=20, max_length=200_000)
+    source: str | None = None
+
+
+class QuestionRequest(BaseModel):
+    question: str = Field(min_length=3, max_length=1000)
